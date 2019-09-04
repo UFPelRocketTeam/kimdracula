@@ -21,7 +21,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
-
+#include "stm32f1xx.h"
+#include "stm32f1xx_hal_rcc.h"
+#include "stm32f1xx_hal_i2c.h"
+#include <math.h>
+#include <stdbool.h>
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -33,6 +38,15 @@
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
+#define I2Cx_RCC		RCC_APB1Periph_I2C2
+#define I2Cx			I2C2
+#define I2C_GPIO_RCC 	GPIOB
+#define I2C_PIN_SDA		GPIO_Pin_7
+#define I2C_PIN_SCL		GPIO_Pin_6
+
+/* Hardware Addresses */
+#define MPU6050			0x68<<1
+#define BMP180R			0xEF<<1
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -48,6 +62,9 @@ I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
+uint8_t status = 0;
+uint8_t rxbuf_i2c;
+uint8_t txbuf_i2c[2];
 
 /* USER CODE END PV */
 
@@ -98,13 +115,17 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_I2C_Mem_Read(&hi2c1,MPU6050,0x74,I2C_MEMADD_SIZE_8BIT, &rxbuf_i2c,1,100);
+  HAL_Delay(100);
+  char transmitbuf[];
+  //TODO: transmitir o valor do registrador pra porta serial.
 
+  CDC_Transmit_FS();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1){
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -180,6 +201,10 @@ static void MX_I2C1_Init(void)
   hi2c1.Init.OwnAddress2 = 0;
   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+
+
+
+
   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
   {
     Error_Handler();
@@ -269,6 +294,12 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
+}
+
+void i2c_start(){
+	while (!(HAL_I2C_STATE_READY));
+
+
 }
 
 #ifdef  USE_FULL_ASSERT
