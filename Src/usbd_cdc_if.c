@@ -265,8 +265,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
 	if (Buf[0] =='1'){
 		HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13, 0);
-		char data[] = "LED ON\n\r";
+		char data[] = "Transmitting data...\n\r";
 		CDC_Transmit_FS(data,strlen(data));
+
 	}
 
 	else if (Buf[0] == '0'){

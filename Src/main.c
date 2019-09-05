@@ -45,8 +45,40 @@
 #define I2C_PIN_SCL		GPIO_Pin_6
 
 /* Hardware Addresses */
-#define MPU6050			0x68<<1
-#define BMP180R			0xEF<<1
+#define MPU6050			0x68
+#define BMP180			0xEF
+
+/* Register Maps */
+	//MPU6050
+#define SYSTEM_CONFIG	0x1A
+
+#define TEMP_OUT_H		0x41
+#define TEMP_OUT_L		0x42
+
+#define ACCEL_CONFIG	0x1c
+
+#define ACCEL_XOUT_H	0x3b
+#define ACCEL_XOUT_L	0x3c
+
+#define ACCEL_YOUT_H	0x3d
+#define ACCEL_YOUT_L	0x3e
+
+#define ACCEL_ZOUT_H	0x3f
+#define ACCEL_ZOUT_L	0x40
+
+#define GYROS_CONFIG	0x1b
+
+#define GYROS_XOUT_H	0x43
+#define GYROS_XOUT_L	0x44
+
+#define GYROS_YOUT_H	0x45
+#define GYROS_YOUT_L	0x46
+
+#define GYROS_ZOUT_H	0x47
+#define GYROS_ZOUT_L	0x48
+
+
+	//BMP180
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -73,6 +105,9 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
+void spit_i2c(void);
+void send_linebreak(void);
+uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -86,6 +121,19 @@ static void MX_SPI1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
+void send_linebreak(void){
+	char linebreak[] = ";\n\r";
+	CDC_Transmit_FS(linebreak, strlen(linebreak));
+}
+void spit_i2c(void){
+
+
+
+}
+
+// TODO: IMPLEMENTAR DMA
+
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -115,19 +163,26 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_I2C_Mem_Read(&hi2c1,MPU6050,0x74,I2C_MEMADD_SIZE_8BIT, &rxbuf_i2c,1,100);
-  HAL_Delay(100);
-  char transmitbuf[];
-  //TODO: transmitir o valor do registrador pra porta serial.
 
-  CDC_Transmit_FS();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
     /* USER CODE END WHILE */
-
+	  char msg[] = "----\n\r";
+	  CDC_Transmit_FS(msg, strlen(msg));
+	  send_linebreak();
+	  uint8_t sensorL;
+	  uint8_t sensorH;
+	  uint16_t sensout;
+	  char buf[8];
+	  HAL_I2C_Mem_Read(&hi2c1,MPU6050,ACCEL_XOUT_H,sizeof(uint8_t),sensorH,1,1);
+	  HAL_I2C_Mem_Read(&hi2c1,MPU6050,ACCEL_XOUT_L,sizeof(uint8_t),sensorL,1,1);
+	  sensout = sensorH << 8 | sensorL;
+	  itoa(sensout,buf,10);
+	  CDC_Transmit_FS(buf,strlen(buf));
+	  send_linebreak();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -177,6 +232,7 @@ void SystemClock_Config(void)
   }
 }
 
+
 /**
   * @brief I2C1 Initialization Function
   * @param None
@@ -193,7 +249,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.ClockSpeed = 100000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
