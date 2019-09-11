@@ -38,14 +38,13 @@
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
-#define I2Cx_RCC		RCC_APB1Periph_I2C2
-#define I2Cx			I2C2
-#define I2C_GPIO_RCC 	GPIOB
-#define I2C_PIN_SDA		GPIO_Pin_7
-#define I2C_PIN_SCL		GPIO_Pin_6
+#define I2C1_SCL_Pin GPIO_PIN_6
+#define I2C1_SCL_GPIO_Port GPIOB
+#define I2C1_SDA_Pin GPIO_PIN_7
+#define I2C1_SDA_GPIO_Port GPIOB
 
 /* Hardware Addresses */
-#define MPU6050			0x68
+#define MPU6050			0x69<<1
 #define BMP180			0xEF
 
 /* Register Maps */
@@ -180,7 +179,7 @@ int main(void)
 	  // send_linebreak();
 
 	  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,1);
-	  HAL_I2C_Mem_Read(&hi2c1, MPU6050<<1,0x75,sizeof(uint8_t),&rx,1,100 );
+	  HAL_I2C_Mem_Read(&hi2c1, MPU6050,0x75,sizeof(uint8_t),&rx,1,100 );
 
 
 	  //send_linebreak();
