@@ -105,9 +105,9 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
-void spit_i2c(void);
-void send_linebreak(void);
-uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
+//void spit_i2c(void);
+//void send_linebreak(void);
+//uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -121,6 +121,8 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
   * @brief  The application entry point.
   * @retval int
   */
+
+/*
 void send_linebreak(void){
 	char linebreak[] = ";\n\r";
 	CDC_Transmit_FS(linebreak, strlen(linebreak));
@@ -130,7 +132,7 @@ void spit_i2c(void){
 
 
 }
-
+*/
 // TODO: IMPLEMENTAR DMA
 
 
@@ -162,27 +164,26 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
+  // HAL_I2C_ModeType
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-
+  uint8_t rx;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
     /* USER CODE END WHILE */
-	  char msg[] = "----\n\r";
-	  CDC_Transmit_FS(msg, strlen(msg));
-	  send_linebreak();
-	  uint8_t sensorL;
-	  uint8_t sensorH;
-	  uint16_t sensout;
-	  char buf[8];
-	  HAL_I2C_Mem_Read(&hi2c1,MPU6050,ACCEL_XOUT_H,sizeof(uint8_t),sensorH,1,1);
-	  HAL_I2C_Mem_Read(&hi2c1,MPU6050,ACCEL_XOUT_L,sizeof(uint8_t),sensorL,1,1);
-	  sensout = sensorH << 8 | sensorL;
-	  itoa(sensout,buf,10);
-	  CDC_Transmit_FS(buf,strlen(buf));
-	  send_linebreak();
+	  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,0);
+	  HAL_Delay(3000);
+	  //char msg[] = "----\n\r";
+	  // CDC_Transmit_FS(msg, strlen(msg));
+	  // send_linebreak();
+
+	  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,1);
+	  HAL_I2C_Mem_Read(&hi2c1, MPU6050<<1,0x75,sizeof(uint8_t),&rx,1,100 );
+
+
+	  //send_linebreak();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -352,11 +353,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-void i2c_start(){
-	while (!(HAL_I2C_STATE_READY));
 
-
-}
 
 #ifdef  USE_FULL_ASSERT
 /**
