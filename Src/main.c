@@ -178,9 +178,9 @@ int main(void)
 	  // CDC_Transmit_FS(msg, strlen(msg));
 	  // send_linebreak();
 
-	  HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,1);
+	  /*HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,1);
 	  HAL_I2C_Mem_Read(&hi2c1,104 ,0x75,8,&rx,1,100 );
-
+*/
 	  //send_linebreak();
     /* USER CODE BEGIN 3 */
   }
