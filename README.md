@@ -16,7 +16,5 @@ Talvez o struct que ele usa pra criar as GPIOs do i2c não funcione out of the b
 
 Nota mental: não gerar arquivos de projeto direto do CubeMX e esperar que funcione. Usar a HAL desse projeto como base pros futuros, especialmente se usar I2C
 
-Aparentemente a ST programou essa HAL com a bunda. Errata pertinente ao STM32F103xC:
+Errata pertinente ao STM32F103xC:
 https://www.st.com/content/ccc/resource/technical/document/errata_sheet/f5/50/c9/46/56/db/4a/f6/CD00197763.pdf/files/CD00197763.pdf/jcr:content/translations/en.CD00197763.pdf
-
-Catando aquele tutorial maroto do dito ChibiOS pra ver se rola sentimento
